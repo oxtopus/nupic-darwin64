@@ -79,3 +79,17 @@ alias pydoc="python -m pydoc"
 if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
     hash -r 2>/dev/null
 fi
+
+# Installation path
+export NTA=$VIRTUAL_ENV/nta/eng
+# Target source/repo path. Defaults to $PWD
+export NUPIC=$VIRTUAL_ENV/nupic
+# Convenience variable for temporary build files
+export BUILDDIR=/tmp/ntabuild
+# Number of jobs to run in parallel (optional)
+export MK_JOBS=3
+
+if [ -d "$NUPIC" ]; then
+  source $NUPIC/env.sh
+fi
+
