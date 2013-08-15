@@ -21,5 +21,6 @@ def fixupLinks(pth, ignore=["*.pyc", "*.pyo"]):
 
 
 if __name__ == "__main__":
+  fixupLinks(".")
   fixupLinks("include")
   fixupLinks("lib/python2.6")
