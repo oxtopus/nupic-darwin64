@@ -1,6 +1,6 @@
-### nupic-py2.6-darwin64
+### nupic-darwin64
 
-Python 2.6 distribution for NuPIC on OS X.  Originally created from a
+Python distribution for NuPIC on OS X.  Originally created from a
 [virtualenv](http://www.virtualenv.org/en/latest/)-based NuPIC installation
 on OS X, this project provides a fully-functional python environment in which
 to build and run [NuPIC](https://github.com/numenta/nupic)
@@ -9,16 +9,11 @@ to build and run [NuPIC](https://github.com/numenta/nupic)
 
 Clone this repository:
 
-    git clone https://github.com/oxtopus/nupic-py2.6-darwin64.git
-
-Clone NuPIC:
-
-    cd nupic-py2.6-darwin64
-    git clone https://github.com/numenta/nupic.git
+    git clone https://github.com/numenta/nupic-darwin64.git
 
 Activate your environment:
 
-    source bin/activate
+    source nupic-darwin64/bin/activate
 
 Build NuPIC:
 

@@ -82,8 +82,6 @@ fi
 
 # Installation path
 export NTA=$VIRTUAL_ENV/nta/eng
-# Target source/repo path. Defaults to $PWD
-export NUPIC=$VIRTUAL_ENV/nupic
 # Convenience variable for temporary build files
 export BUILDDIR=/tmp/ntabuild
 # Number of jobs to run in parallel (optional)
