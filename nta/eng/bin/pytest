@@ -1,0 +1,7 @@
+#!/Users/amarshall/nta/nupic-env/bin/python -u
+
+import warnings
+warnings.simplefilter('default', DeprecationWarning)
+
+from logilab.common.pytest import run
+run()
