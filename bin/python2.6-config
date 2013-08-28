@@ -1,15 +1,15 @@
-#!/Users/amarshall/nta/nupic-env/bin/python2.6
+#!/usr/bin/env python
 
 import sys
 import os
 import getopt
 from distutils import sysconfig
 
-valid_opts = ['prefix', 'exec-prefix', 'includes', 'libs', 'cflags', 
+valid_opts = ['prefix', 'exec-prefix', 'includes', 'libs', 'cflags',
               'ldflags', 'help']
 
 def exit_with_usage(code=1):
-    print >>sys.stderr, "Usage: %s [%s]" % (sys.argv[0], 
+    print >>sys.stderr, "Usage: %s [%s]" % (sys.argv[0],
                                             '|'.join('--'+opt for opt in valid_opts))
     sys.exit(code)
 

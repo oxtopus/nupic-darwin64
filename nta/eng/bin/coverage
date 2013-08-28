@@ -1,4 +1,4 @@
-#!/Users/amarshall/nta/nupic-env/bin/python
+#!/usr/bin/env python
 # EASY-INSTALL-ENTRY-SCRIPT: 'coverage==3.6','console_scripts','coverage'
 __requires__ = 'coverage==3.6'
 import sys

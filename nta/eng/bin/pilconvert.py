@@ -1,4 +1,4 @@
-#!/Users/amarshall/nta/nupic-env/bin/python
+#!/usr/bin/env python
 #
 # The Python Imaging Library.
 # $Id$

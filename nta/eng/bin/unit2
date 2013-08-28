@@ -1,4 +1,4 @@
-#!/Users/amarshall/nta/nupic-env/bin/python
+#!/usr/bin/env python
 # EASY-INSTALL-ENTRY-SCRIPT: 'unittest2==0.5.1','console_scripts','unit2'
 __requires__ = 'unittest2==0.5.1'
 import sys
