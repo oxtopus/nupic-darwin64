@@ -1,5 +1,15 @@
 *.pyc
 *.pyo
+bin/2to3
+bin/idle
+bin/pydoc
+bin/python
+bin/python-config
+bin/python2.6
+bin/python2.6-config
+bin/smtpd.py
+lib/libpython2.6.dylib
+lib/python2.6/*.py
 nta/eng/.build.json
 nta/eng/.buildinfo
 nta/eng/bin/htmtest
