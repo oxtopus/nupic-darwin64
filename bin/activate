@@ -10,11 +10,6 @@ deactivate () {
         export PATH
         unset _OLD_VIRTUAL_PATH
     fi
-    if [ -n "$_OLD_VIRTUAL_PYTHONHOME" ] ; then
-        PYTHONHOME="$_OLD_VIRTUAL_PYTHONHOME"
-        export PYTHONHOME
-        unset _OLD_VIRTUAL_PYTHONHOME
-    fi
     if [ -n "$_OLD_VIRTUAL_PYTHONPATH" ] ; then
         PYTHONPATH="$_OLD_VIRTUAL_PYTHONPATH"
         export PYTHONPATH
@@ -51,20 +46,17 @@ deactivate nondestructive
 VIRTUAL_ENV="$(dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))"
 export VIRTUAL_ENV
 
-_OLD_VIRTUAL_PYTHONHOME="$PYTHONHOME"
-export PYTHONHOME="$VIRTUAL_ENV"
-
 _OLD_VIRTUAL_PYTHONPATH="$PYTHONPATH"
-export PYTHONPATH="$VIRTUAL_PYTHONPATH/lib/python2.6/site-packages:$PYTHONPATH"
+export PYTHONPATH="$VIRTUAL_ENV/lib/python2.6/site-packages:$PYTHONPATH"
 
 _OLD_VIRTUAL_PATH="$PATH"
 export PATH="$VIRTUAL_ENV/bin:$PATH"
 
 _OLD_VIRTUAL_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH=$PYTHONHOME/lib
+export LD_LIBRARY_PATH=$VIRTUAL_ENV/lib:$LD_LIBRARY_PATH
 
 _OLD_VIRTUAL_DYLD_LIBRARY_PATH="$LD_DYLIBRARY_PATH"
-export DYLD_LIBRARY_PATH=$PYTHONHOME/lib
+export DYLD_LIBRARY_PATH=$VIRTUAL_ENV/lib:$LD_LIBRARY_PATH
 
 alias pydoc="python -m pydoc"
 
@@ -95,5 +87,4 @@ echo "MK_JOBS=$MKJOBS"
 echo "NUPIC=$NUPIC"
 echo "NTA=$NTA"
 echo "PATH=$PATH"
-echo "PYTHONHOME=$PYTHONHOME"
 echo "PYTHONPATH=$PYTHONPATH"
