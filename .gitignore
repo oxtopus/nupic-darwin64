@@ -1,0 +1,17 @@
+*.pyc
+*.pyo
+nta/eng/.build.json
+nta/eng/.buildinfo
+nta/eng/bin/htmtest
+nta/eng/bin/run_swarm.py
+nta/eng/bin/run_tests.py
+nta/eng/bin/run_tests.sh
+nta/eng/bin/testeverything
+nta/eng/build_system
+nta/eng/conf/
+nta/eng/env.sh
+nta/eng/lib/libcpp_region.dylib
+nta/eng/lib/python2.6/site-packages/nupic/
+nta/eng/share/
+nta/eng/tests
+share/man
