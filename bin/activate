@@ -43,11 +43,13 @@ deactivate () {
 # unset irrelavent variables
 deactivate nondestructive
 
+PY_VERSION=`python -c 'import sys; print sys.version[:3]'`
+
 NUPIC_ENV="$(dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))"
 export NUPIC_ENV
 
 _OLD_NUPIC_VIRTUAL_PYTHONPATH="$PYTHONPATH"
-export PYTHONPATH="$NUPIC_ENV/lib/python2.6/site-packages:$PYTHONPATH"
+export PYTHONPATH="$NUPIC_ENV/lib/python$PY_VERSION/site-packages:$PYTHONPATH"
 
 _OLD_NUPIC_VIRTUAL_PATH="$PATH"
 export PATH="$NUPIC_ENV/bin:$PATH"
