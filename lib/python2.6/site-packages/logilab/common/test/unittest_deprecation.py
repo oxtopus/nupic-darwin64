@@ -78,5 +78,66 @@ class RawInputTC(TestCase):
         self.assertEqual(self.messages,
                          ['object moving_target has been moved to module data.deprecation'])
 
+    def test_deprecated_manager(self):
+        deprecator = deprecation.DeprecationManager("module_name")
+        deprecator.compatibility('1.3')
+        # This warn should be printed.
+        deprecator.warn('1.1', "Major deprecation message.", 1)
+        deprecator.warn('1.1')
+
+        @deprecator.deprecated('1.2', 'Major deprecation message.')
+        def any_func():
+            pass
+        any_func()
+
+        @deprecator.deprecated('1.2')
+        def other_func():
+            pass
+        other_func()
+
+        self.assertListEqual(self.messages,
+                             ['[module_name 1.1] Major deprecation message.',
+                              '[module_name 1.1] ',
+                              '[module_name 1.2] Major deprecation message.',
+                              '[module_name 1.2] The function "other_func" is deprecated'])
+
+    def test_class_deprecated_manager(self):
+        deprecator = deprecation.DeprecationManager("module_name")
+        deprecator.compatibility('1.3')
+        class AnyClass:
+            __metaclass__ = deprecator.class_deprecated('1.2')
+        AnyClass()
+        self.assertEqual(self.messages,
+                         ['[module_name 1.2] AnyClass is deprecated'])
+
+
+    def test_deprecated_manager_noprint(self):
+        deprecator = deprecation.DeprecationManager("module_name")
+        deprecator.compatibility('1.3')
+        # This warn should not be printed.
+        deprecator.warn('1.3', "Minor deprecation message.", 1)
+
+        @deprecator.deprecated('1.3', 'Minor deprecation message.')
+        def any_func():
+            pass
+        any_func()
+
+        @deprecator.deprecated('1.20')
+        def other_func():
+            pass
+        other_func()
+
+        @deprecator.deprecated('1.4')
+        def other_func():
+            pass
+        other_func()
+
+        class AnyClass(object):
+            __metaclass__ = deprecator.class_deprecated((1,5))
+        AnyClass()
+
+        self.assertFalse(self.messages)
+
+
 if __name__ == '__main__':
     unittest_main()

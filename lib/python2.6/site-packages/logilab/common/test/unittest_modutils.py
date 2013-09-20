@@ -1,4 +1,4 @@
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -143,16 +143,16 @@ class file_from_modpath_tc(ModutilsTestCase):
     corresponding file, giving priority to source file over precompiled file
     if it exists"""
 
-    def test_knownValues_file_from_modpath_1(self):
+    def test_site_packages(self):
         self.assertEqual(path.realpath(modutils.file_from_modpath(['logilab', 'common', 'modutils'])),
                          path.realpath(modutils.__file__.replace('.pyc', '.py')))
 
-    def test_knownValues_file_from_modpath_2(self):
+    def test_std_lib(self):
         from os import path
         self.assertEqual(path.realpath(modutils.file_from_modpath(['os', 'path']).replace('.pyc', '.py')),
                          path.realpath(path.__file__.replace('.pyc', '.py')))
 
-    def test_knownValues_file_from_modpath_3(self):
+    def test_xmlplus(self):
         try:
             # don't fail if pyxml isn't installed
             from xml.dom import ext
@@ -162,12 +162,14 @@ class file_from_modpath_tc(ModutilsTestCase):
             self.assertEqual(path.realpath(modutils.file_from_modpath(['xml', 'dom', 'ext']).replace('.pyc', '.py')),
                              path.realpath(ext.__file__.replace('.pyc', '.py')))
 
-    def test_knownValues_file_from_modpath_4(self):
+    def test_builtin(self):
         self.assertEqual(modutils.file_from_modpath(['sys']),
                          None)
 
-    def test_raise_file_from_modpath_Exception(self):
+
+    def test_unexisting(self):
         self.assertRaises(ImportError, modutils.file_from_modpath, ['turlututu'])
+
 
 class get_source_file_tc(ModutilsTestCase):
 

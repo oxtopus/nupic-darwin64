@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
+# copyright 2003-2013 LOGILAB S.A. (Paris, FRANCE), all rights reserved.
 # contact http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
 # This file is part of logilab-common.
@@ -570,9 +570,14 @@ def _search_zip(modpath, pic):
             if importer.find_module(modpath[0]):
                 if not importer.find_module('/'.join(modpath)):
                     raise ImportError('No module named %s in %s/%s' % (
-                        '.'.join(modpath[1:]), file, modpath))
+                        '.'.join(modpath[1:]), filepath, modpath))
                 return ZIPFILE, abspath(filepath) + '/' + '/'.join(modpath), filepath
     raise ImportError('No module named %s' % '.'.join(modpath))
+
+try:
+    import pkg_resources
+except ImportError:
+    pkg_resources = None
 
 def _module_file(modpath, path=None):
     """get a module type / file path
@@ -604,16 +609,32 @@ def _module_file(modpath, path=None):
         checkeggs = True
     except AttributeError:
         checkeggs = False
+    # pkg_resources support (aka setuptools namespace packages)
+    if pkg_resources is not None and modpath[0] in pkg_resources._namespace_packages and len(modpath) > 1:
+        # setuptools has added into sys.modules a module object with proper
+        # __path__, get back information from there
+        module = sys.modules[modpath.pop(0)]
+        path = module.__path__
     imported = []
     while modpath:
+        modname = modpath[0]
+        # take care to changes in find_module implementation wrt builtin modules
+        #
+        # Python 2.6.6 (r266:84292, Sep 11 2012, 08:34:23)
+        # >>> imp.find_module('posix')
+        # (None, 'posix', ('', '', 6))
+        #
+        # Python 3.3.1 (default, Apr 26 2013, 12:08:46)
+        # >>> imp.find_module('posix')
+        # (None, None, ('', '', 6))
         try:
-            _, mp_filename, mp_desc = find_module(modpath[0], path)
+            _, mp_filename, mp_desc = find_module(modname, path)
         except ImportError:
             if checkeggs:
                 return _search_zip(modpath, pic)[:2]
             raise
         else:
-            if checkeggs:
+            if checkeggs and mp_filename:
                 fullabspath = [abspath(x) for x in _path]
                 try:
                     pathindex = fullabspath.index(dirname(abspath(mp_filename)))
@@ -633,7 +654,16 @@ def _module_file(modpath, path=None):
             if mtype != PKG_DIRECTORY:
                 raise ImportError('No module %s in %s' % ('.'.join(modpath),
                                                           '.'.join(imported)))
-            path = [mp_filename]
+            # XXX guess if package is using pkgutil.extend_path by looking for
+            # those keywords in the first four Kbytes
+            data = open(join(mp_filename, '__init__.py')).read(4096)
+            if 'pkgutil' in data and 'extend_path' in data:
+                # extend_path is called, search sys.path for module/packages of this name
+                # see pkgutil.extend_path documentation
+                path = [join(p, modname) for p in sys.path
+                        if isdir(join(p, modname))]
+            else:
+                path = [mp_filename]
     return mtype, mp_filename
 
 def _is_python_file(filename):

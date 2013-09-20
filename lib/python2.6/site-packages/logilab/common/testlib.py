@@ -721,7 +721,7 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
                 base = ''
             self.fail(base + '\n'.join(msgs))
 
-    @deprecated('Please use assertItemsEqual instead.')
+    @deprecated('Please use assertCountEqual instead.')
     def assertUnorderedIterableEquals(self, got, expected, msg=None):
         """compares two iterable and shows difference between both
 
@@ -1183,10 +1183,13 @@ succeeded test into", osp.join(os.getcwd(), FILE_RESTART)
 
     assertRaises = failUnlessRaises
 
-    if not hasattr(unittest.TestCase, 'assertItemsEqual'):
-        # python 3.2 has deprecated assertSameElements and is missing
-        # assertItemsEqual
-        assertItemsEqual = unittest.TestCase.assertSameElements
+    if sys.version_info >= (3,2):
+        assertItemsEqual = unittest.TestCase.assertCountEqual
+    else:
+        assertCountEqual = unittest.TestCase.assertItemsEqual
+
+TestCase.assertItemsEqual = deprecated('assertItemsEqual is deprecated, use assertCountEqual')(
+    TestCase.assertItemsEqual)
 
 import doctest
 

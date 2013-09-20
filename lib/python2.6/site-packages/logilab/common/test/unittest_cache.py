@@ -33,7 +33,7 @@ class CacheTestCase(TestCase):
         self.assertEqual(len(self.cache._usage), 1)
         self.assertEqual(self.cache._usage[-1], 1,
                          '1 is not the most recently used key')
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys(),
                               "usage list and data keys are different")
 
@@ -47,7 +47,7 @@ class CacheTestCase(TestCase):
                          "lenght of usage list is not 2")
         self.assertEqual(self.cache._usage[-1], 2,
                      '1 is not the most recently used key')
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 
     def test_setitem3(self):
@@ -57,7 +57,7 @@ class CacheTestCase(TestCase):
         self.assertEqual(self.cache[1], 'bar', "1 : 'bar' is not in cache.data")
         self.assertEqual(len(self.cache._usage), 1, "lenght of usage list is not 1")
         self.assertEqual(self.cache._usage[-1], 1, '1 is not the most recently used key')
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 
     def test_recycling1(self):
@@ -74,7 +74,7 @@ class CacheTestCase(TestCase):
                      'key 1 has not been suppressed from the cache LRU list')
         self.assertEqual(len(self.cache._usage), 5, "lenght of usage list is not 5")
         self.assertEqual(self.cache._usage[-1], 6, '6 is not the most recently used key')
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 
     def test_recycling2(self):
@@ -86,7 +86,7 @@ class CacheTestCase(TestCase):
         a = self.cache[1]
         self.assertEqual(a, 'foo')
         self.assertEqual(self.cache._usage[-1], 1, '1 is not the most recently used key')
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 
     def test_delitem(self):
@@ -97,7 +97,7 @@ class CacheTestCase(TestCase):
         del self.cache['foo']
         self.assertTrue('foo' not in self.cache.keys(), "Element 'foo' was not removed cache dictionnary")
         self.assertTrue('foo' not in self.cache._usage, "Element 'foo' was not removed usage list")
-        self.assertItemsEqual(self.cache._usage,
+        self.assertCountEqual(self.cache._usage,
                               self.cache.keys())# usage list and data keys are different
 
 

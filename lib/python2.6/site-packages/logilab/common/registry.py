@@ -933,9 +933,9 @@ def wrap_predicates(decorator):
         predicate.__call__ = decorator(predicate.__call__)
 
 class PredicateMetaClass(type):
-    def __new__(cls, *args, **kwargs):
+    def __new__(mcs, *args, **kwargs):
         # use __new__ so subclasses doesn't have to call Predicate.__init__
-        inst = type.__new__(cls, *args, **kwargs)
+        inst = type.__new__(mcs, *args, **kwargs)
         proxy = weakref.proxy(inst, lambda p: _PREDICATES.pop(id(p)))
         _PREDICATES[id(proxy)] = proxy
         return inst
