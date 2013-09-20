@@ -20,3 +20,10 @@ Build NuPIC:
 
 See https://github.com/numenta/nupic#try-it-out for further instructions for
 using NuPIC.
+
+## Building nupic requirements
+
+A Makefile is provided should you need to reconstruct this environment.
+
+    source bin/activate
+    make
