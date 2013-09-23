@@ -6,7 +6,7 @@ setuptools:
 	(cd setuptools-1.0 && python setup.py install --prefix=${NUPIC_ENV})
 
 pip: setuptools
-	easy_install --prefix=. pip-1.4.1.tar.gz
+	easy_install --prefix=${NUPIC_ENV} pip-1.4.1.tar.gz
 
 numpy:
 	pip install --install-option="--prefix=${NUPIC_ENV}" --ignore-installed --upgrade --find-links="file://${NUPIC}/external/common/pip-cache" numpy==1.7.1
