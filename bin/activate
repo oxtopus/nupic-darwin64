@@ -1,7 +1,7 @@
 # This file must be used with "source bin/activate" *from bash*
 # you cannot run it directly
 
-deactivate () {
+deactivate_nupic () {
     unset pydoc
 
     # reset old environment variables
@@ -36,12 +36,12 @@ deactivate () {
     unset NUPIC_ENV
     if [ ! "$1" = "nondestructive" ] ; then
     # Self destruct!
-        unset -f deactivate
+        unset -f deactivate_nupic
     fi
 }
 
 # unset irrelavent variables
-deactivate nondestructive
+deactivate_nupic nondestructive
 
 PY_VERSION=`python -c 'import sys; print sys.version[:3]'`
 
