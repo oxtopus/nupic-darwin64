@@ -1,12 +1,13 @@
 """
 local path implementation.
 """
-import sys, os, stat, re, atexit
+from contextlib import contextmanager
+import sys, os, re, atexit
 import py
 from py._path import common
 from stat import S_ISLNK, S_ISDIR, S_ISREG
 
-from os.path import normpath, isabs, exists, isdir, isfile
+from os.path import normpath, isabs, exists, isdir, isfile, islink
 
 iswin32 = sys.platform == "win32" or (getattr(os, '_name', False) == 'nt')
 
@@ -133,54 +134,64 @@ class LocalPath(FSBase):
             st = self.path.lstat()
             return S_ISLNK(st.mode)
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, expanduser=False):
         """ Initialize and return a local Path instance.
 
         Path can be relative to the current directory.
-        If it is None then the current working directory is taken.
+        If path is None it defaults to the current working directory.
+        If expanduser is True, tilde-expansion is performed.
         Note that Path instances always carry an absolute path.
         Note also that passing in a local path object will simply return
         the exact same path object. Use new() to get a new copy.
         """
         if path is None:
-            self.strpath = os.getcwd()
+            self.strpath = py.error.checked_call(os.getcwd)
         elif isinstance(path, common.PathBase):
             self.strpath = path.strpath
         elif isinstance(path, py.builtin._basestring):
+            if expanduser:
+                path = os.path.expanduser(path)
             self.strpath = os.path.abspath(normpath(str(path)))
         else:
             raise ValueError("can only pass None, Path instances "
                              "or non-empty strings to LocalPath")
-        assert isinstance(self.strpath, str)
+        assert isinstance(self.strpath, py.builtin._basestring)
 
     def __hash__(self):
         return hash(self.strpath)
 
     def __eq__(self, other):
-        s1 = str(self)
-        s2 = str(other)
+        s1 = self.strpath
+        s2 = getattr(other, "strpath", other)
         if iswin32:
             s1 = s1.lower()
-            s2 = s2.lower()
+            try:
+                s2 = s2.lower()
+            except AttributeError:
+                return False
         return s1 == s2
 
     def __ne__(self, other):
         return not (self == other)
 
     def __lt__(self, other):
-        return str(self) < str(other)
+        return self.strpath < getattr(other, "strpath", other)
+
+    def __gt__(self, other):
+        return self.strpath > getattr(other, "strpath", other)
 
     def samefile(self, other):
         """ return True if 'other' references the same file as 'self'.
         """
-        if not isinstance(other, py.path.local):
-            other = os.path.abspath(str(other))
+        other = getattr(other, "strpath", other)
+        if not os.path.isabs(other):
+            other = os.path.abspath(other)
         if self == other:
             return True
         if iswin32:
-            return False # ther is no samefile
+            return False # there is no samefile
         return py.error.checked_call(
-                os.path.samefile, str(self), str(other))
+                os.path.samefile, self.strpath, other)
 
     def remove(self, rec=1, ignore_errors=False):
         """ remove a file or directory (or a directory tree if rec=1).
@@ -299,7 +310,7 @@ class LocalPath(FSBase):
         of the args is an absolute path.
         """
         sep = self.sep
-        strargs = map_as_list(str, args)
+        strargs = [getattr(arg, "strpath", arg) for arg in args]
         strpath = self.strpath
         if kwargs.get('abs'):
             newargs = []
@@ -320,8 +331,13 @@ class LocalPath(FSBase):
         obj.strpath = normpath(strpath)
         return obj
 
-    def open(self, mode='r'):
-        """ return an opened file with the given mode. """
+    def open(self, mode='r', ensure=False):
+        """ return an opened file with the given mode.
+
+        If ensure is True, create parent directories if needed.
+        """
+        if ensure:
+            self.dirpath().ensure(dir=1)
         return py.error.checked_call(open, self.strpath, mode)
 
     def _fastjoin(self, name):
@@ -329,7 +345,9 @@ class LocalPath(FSBase):
         child.strpath = self.strpath + self.sep + name
         return child
 
-    _fastcheck = set("file dir link")
+    def islink(self):
+        return islink(self.strpath)
+
     def check(self, **kw):
         if not kw:
             return exists(self.strpath)
@@ -348,7 +366,7 @@ class LocalPath(FSBase):
         if fil is None and sort is None:
             names = py.error.checked_call(os.listdir, self.strpath)
             return map_as_list(self._fastjoin, names)
-        if isinstance(fil, str):
+        if isinstance(fil, py.builtin._basestring):
             if not self._patternchars.intersection(fil):
                 child = self._fastjoin(fil)
                 if os.path.exists(child.strpath):
@@ -400,7 +418,8 @@ class LocalPath(FSBase):
 
     def rename(self, target):
         """ rename this path to target. """
-        return py.error.checked_call(os.rename, str(self), str(target))
+        target = getattr(target, "strpath", target)
+        return py.error.checked_call(os.rename, self.strpath, target)
 
     def dump(self, obj, bin=1):
         """ pickle object into path location"""
@@ -413,11 +432,15 @@ class LocalPath(FSBase):
     def mkdir(self, *args):
         """ create & return the directory joined with args. """
         p = self.join(*args)
-        py.error.checked_call(os.mkdir, str(p))
+        py.error.checked_call(os.mkdir, getattr(p, "strpath", p))
         return p
 
-    def write(self, data, mode='w'):
-        """ write data into path. """
+    def write(self, data, mode='w', ensure=False):
+        """ write data into path.   If ensure is True create
+        missing parent directories.
+        """
+        if ensure:
+            self.dirpath().ensure(dir=1)
         if 'b' in mode:
             if not py.builtin._isbytes(data):
                 raise ValueError("can only process bytes")
@@ -493,9 +516,24 @@ class LocalPath(FSBase):
 
     def chdir(self):
         """ change directory to self and return old current directory """
-        old = self.__class__()
+        try:
+            old = self.__class__()
+        except py.error.ENOENT:
+            old = None
         py.error.checked_call(os.chdir, self.strpath)
         return old
+
+
+    @contextmanager
+    def as_cwd(self):
+        """ return context manager which changes to current dir during the
+        managed "with" context. On __enter__ it returns the old dir.
+        """
+        old = self.chdir()
+        try:
+            yield old
+        finally:
+            old.chdir()
 
     def realpath(self):
         """ return a new path which contains no symbolic links."""
@@ -685,7 +723,10 @@ class LocalPath(FSBase):
         try:
             x = os.environ['HOME']
         except KeyError:
-            x = os.environ["HOMEDRIVE"] + os.environ['HOMEPATH']
+            try:
+                x = os.environ["HOMEDRIVE"] + os.environ['HOMEPATH']
+            except KeyError:
+                return None
         return cls(x)
     _gethomedir = classmethod(_gethomedir)
 

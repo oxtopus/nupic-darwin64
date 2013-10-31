@@ -223,6 +223,10 @@ newline will be removed from the end of each line. """
             return strself[len(strrelpath):]
         return ""
 
+    def ensure_dir(self, *args):
+        """ ensure the path joined with args is a directory. """
+        return self.ensure(*args, **{"dir": True})
+
     def bestrelpath(self, dest):
         """ return a string which is a relative path from self
             (assumed to be a directory) to dest such that
@@ -249,6 +253,14 @@ newline will be removed from the end of each line. """
         except AttributeError:
             return str(dest)
 
+    def exists(self):
+        return self.check()
+
+    def isdir(self):
+        return self.check(dir=1)
+
+    def isfile(self):
+        return self.check(file=1)
 
     def parts(self, reverse=False):
         """ return a root-first list of all ancestor directories

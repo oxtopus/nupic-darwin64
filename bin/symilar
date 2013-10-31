@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # EASY-INSTALL-ENTRY-SCRIPT: 'pylint==0.28.0','console_scripts','symilar'
 __requires__ = 'pylint==0.28.0'
 import sys

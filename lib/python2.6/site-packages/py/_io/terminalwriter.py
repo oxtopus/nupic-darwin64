@@ -11,12 +11,17 @@ py3k = sys.version_info[0] >= 3
 from py.builtin import text, bytes
 
 win32_and_ctypes = False
+colorama = None
 if sys.platform == "win32":
     try:
-        import ctypes
-        win32_and_ctypes = True
+        import colorama
     except ImportError:
-        pass
+        try:
+            import ctypes
+            win32_and_ctypes = True
+        except ImportError:
+            pass
+
 
 def _getdimensions():
     import termios,fcntl,struct
@@ -117,6 +122,8 @@ class TerminalWriter(object):
         elif py.builtin.callable(file) and not (
              hasattr(file, "write") and hasattr(file, "flush")):
             file = WriteFile(file, encoding=encoding)
+        if hasattr(file, "isatty") and file.isatty() and colorama:
+            file = colorama.AnsiToWin32(file).stream
         self.encoding = encoding or getattr(file, 'encoding', "utf-8")
         self._file = file
         self.fullwidth = get_terminal_width()
@@ -143,6 +150,12 @@ class TerminalWriter(object):
             fullwidth = self.fullwidth
         # the goal is to have the line be as long as possible
         # under the condition that len(line) <= fullwidth
+        if sys.platform == "win32":
+            # if we print in the last column on windows we are on a
+            # new line but there is no way to verify/neutralize this
+            # (we may not know the exact line width)
+            # so let's be defensive to avoid empty lines in the output
+            fullwidth -= 1
         if title is not None:
             # we want 2 + 2*len(fill) + len(title) <= fullwidth
             # i.e.    2 + 2*len(sepchar)*N + len(title) <= fullwidth
