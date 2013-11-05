@@ -70,11 +70,17 @@ if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
 fi
 
 # Installation path
-export NTA=$NUPIC_ENV/nta/eng
+if [[ ! -n $NTA ]] ; then 
+  export NTA=$NUPIC_ENV/nta/eng
+fi
 # Convenience variable for temporary build files
-export BUILDDIR=/tmp/ntabuild
+if [[ ! -n $BUILDDIR ]] ; then
+  export BUILDDIR=/tmp/ntabuild
+fi
 # Number of jobs to run in parallel (optional)
-export MK_JOBS=3
+if [[ ! -n $MK_JOBS ]] ; then
+  export MK_JOBS=3
+fi
 
 if [ -d "$NUPIC" ]; then
   source $NUPIC/env.sh
@@ -90,3 +96,5 @@ echo "NUPIC=$NUPIC"
 echo "NTA=$NTA"
 echo "PATH=$PATH"
 echo "PYTHONPATH=$PYTHONPATH"
+echo ""
+echo "To exit this env run: deactivate_nupic"
