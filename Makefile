@@ -2,19 +2,22 @@
 all: setuptools pip nupic-requirements
 
 setuptools:
-	tar xzvf setuptools-1.0.tar.gz
-	(cd setuptools-1.0 && python setup.py install --prefix=${NUPIC_ENV})
+	tar xzvf setuptools-2.1.tar.gz
+	(cd setuptools-2.1 && python setup.py install --root=${NUPIC_ENV})
 
 pip: setuptools
-	easy_install --prefix=${NUPIC_ENV} pip-1.4.1.tar.gz
+	tar xzvf pip-1.5.1.tar.gz
+	(cd pip-1.5.1 && python setup.py install --root=${NUPIC_ENV})
 
-requirements:
-	pip install --install-option="--prefix=${NUPIC_ENV}" --ignore-installed --upgrade --build="${NUPIC_ENV}/pip-build" -r ${NUPIC}/external/common/requirements.txt
-	mkdir -p ${NUPIC_ENV}/lib/python${PY_VERSION}/site-packages
-	echo "import os; os.environ.get('COV_CORE_SOURCE') and __import__('cov_core_init').init()" > ${NUPIC_ENV}/lib/python${PY_VERSION}/site-packages/init_cov_core.pth
+requirements: wheels
+	pip install --use-wheel --find-links=${NUPIC_ENV}/python-wheels --root=${NUPIC_ENV} --no-deps ${NUPIC_ENV}/python-wheels/*
 
 nupic-requirements: requirements
 
+wheels: pip
+	pip install --root=${NUPIC_ENV} wheel
+	pip wheel --wheel-dir=${NUPIC_ENV}/python-wheels -r ${NUPIC}/external/common/requirements.txt --allow-external PIL --allow-unverified PIL --allow-external psutil --allow-unverified psutil
+
 clean:
-	rm -rf setuptools-1.0/
+	rm -rf setuptools-2.1/
 	rm -rf pip-build/

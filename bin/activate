@@ -49,10 +49,10 @@ NUPIC_ENV="$(dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))"
 export NUPIC_ENV
 
 _OLD_NUPIC_VIRTUAL_PYTHONPATH="$PYTHONPATH"
-export PYTHONPATH="$NUPIC_ENV/lib64/python$PY_VERSION/site-packages:$NUPIC_ENV/lib/python$PY_VERSION/site-packages:$PYTHONPATH"
+export PYTHONPATH="$NUPIC_ENV/Library/Python/$PY_VERSION/site-packages:$PYTHONPATH"
 
 _OLD_NUPIC_VIRTUAL_PATH="$PATH"
-export PATH="$NUPIC_ENV/bin:$PATH"
+export PATH="$NUPIC_ENV/bin:$NUPIC_ENV/usr/local/bin:$PATH"
 
 _OLD_NUPIC_VIRTUAL_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH=$NUPIC_ENV/lib64:$NUPIC_ENV/lib:$LD_LIBRARY_PATH
@@ -70,7 +70,7 @@ if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
 fi
 
 # Installation path
-if [[ ! -n $NTA ]] ; then 
+if [[ ! -n $NTA ]] ; then
   export NTA=$NUPIC_ENV/nta/eng
 fi
 # Convenience variable for temporary build files
