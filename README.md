@@ -14,6 +14,10 @@ Activate your environment:
 
     source nupic-darwin64/bin/activate
 
+Install requirements:
+
+    make nupic-requirements
+
 Build NuPIC:
 
     $NUPIC/build.sh
@@ -24,10 +28,3 @@ using NuPIC.
 To exit this environment when you are done: 
 
     deactivate_nupic
-
-## Building nupic requirements
-
-A Makefile is provided should you need to reconstruct this environment.
-
-    source bin/activate
-    make
